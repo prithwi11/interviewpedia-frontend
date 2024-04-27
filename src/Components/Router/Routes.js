@@ -4,14 +4,23 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AdminRouter from './AdminRouter';
 import ClientRouter from './ClientRouter';
 import Login from '../Pages/Admin/UserManagement/Login';
+import Register from '../Pages/Admin/UserManagement/Register';
 
 const AppRouter = () => {
-  const isAdminUserLoggedIn = false
+  const loginDetails = (window.localStorage.getItem('loginDetails'))
+  let  isAdminUserLoggedIn = true
+  if (loginDetails) {
+     isAdminUserLoggedIn = true  
+  }
+  else {
+     isAdminUserLoggedIn = false
+  }
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route  path="/admin/*" element={isAdminUserLoggedIn? <AdminRouter /> : <Navigate to="/login" />} />
+        <Route path="/admin-login" element={<Login />} />
+        <Route path="/admin-register" element={<Register />} />
+        <Route  path="/admin/*" element={isAdminUserLoggedIn? <AdminRouter /> : <Navigate to="/admin-login" />} />
         <Route path="/*" element={<ClientRouter />} />
       </Routes>      
     </Router>
