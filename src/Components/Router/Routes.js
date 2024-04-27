@@ -1,6 +1,6 @@
 // Routes.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminRouter from './AdminRouter';
 import ClientRouter from './ClientRouter';
 import Login from '../Pages/Admin/UserManagement/Login';
