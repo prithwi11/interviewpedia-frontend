@@ -5,28 +5,50 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { Button } from '@mui/material';
 import Paper from '@mui/material/Paper';
+import { ApiCall } from '../../../services/middleware';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import PreLoader from '../../PreLoader';
+import { ToastContainer, toast } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 
 const Category = () => {
   const [showModal, setShowModal] = React.useState(false);
-  
-  function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
+  const [categoryList, setCategoryList] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const getCategoryList = async() => {
+    try {
+      let response = await ApiCall('category_list', {}, 'ADMIN')
+      if (response) {
+        setIsLoading(false)
+        setCategoryList(response.response.data)
+      }
+    }
+    catch (e) {
+      console.log(e)
+      if (e.data) {
+          toast.error(e.data.response.status.message, { hideProgressBar : true })
+      }
+      else {
+        toast.error(e.message, { hideProgressBar : true })
+      }
+    }
   }
-  
-  const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-  ];
+  useEffect(() => {
+    setTimeout(() => 2000)
+    getCategoryList()
+  }, [])
+
 
   return (
-    <div id="main-content" class="h-screen w-5/6 dark:bg-gray-100 relative lg:ml-52 pt-20">
+    <>
+    {isLoading ?  <><PreLoader />  <ToastContainer hideProgressBar theme="colored"/></> : (
+      <div id="main-content" className="h-screen w-5/6 dark:bg-gray-100 relative lg:ml-52 pt-20">
       <main>
-        <div class="container  px-4 py-6 ">
+        <div className="container  px-4 py-6 ">
           <h1 className='text-center font-bold text-3xl'>Category</h1>
           <button className='m-2 p-2 float-right bg-green-700 text-white rounded-lg hover:bg-green-900' onClick={setShowModal}>Add Category</button>
           <button className='m-2 p-2 float-right bg-green-700 text-white rounded-lg hover:bg-green-900'>Add CSV</button>
@@ -35,26 +57,26 @@ const Category = () => {
             <Table  aria-label="simple table">
               <TableHead sx={{ '& th': { fontWeight: 'bold' } }}>
                 <TableRow>
-                  <TableCell sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Dessert (100g serving)</TableCell>
-                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Calories</TableCell>
-                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Fat&nbsp;(g)</TableCell>
-                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Carbs&nbsp;(g)</TableCell>
-                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Protein&nbsp;(g)</TableCell>
+                  <TableCell sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Category Name</TableCell>
+                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Parent</TableCell>
+                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Level</TableCell>
+                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Status</TableCell>
+                  <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {categoryList.map((category) => (
                   <TableRow
-                    key={row.name}
+                    key={category.category_id}
                     sx={{ '&:last-child td, &:last-child th': { borderRight: '1px solid rgba(0, 0, 0, 1)' } }}
                   >
-                    <TableCell component="th" scope="row" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>
-                      {row.name}
+                    <TableCell component="th" scope="category" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>
+                      {category.category_name}
                     </TableCell>
-                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{row.calories}</TableCell>
-                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{row.fat}</TableCell>
-                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{row.carbs}</TableCell>
-                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{row.protein}</TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{category.parent_category_name}</TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{category.level}</TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}>{category.status}</TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid rgba(0, 0, 0, 1)' }}><button className='px-4 mx-4 rounded-sm bg-green-600'>Edit</button><button className='px-4 mx-4 rounded-sm bg-red-600'>Delete</button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -83,13 +105,13 @@ const Category = () => {
                       </div>
                       {/*body*/}
                       <div className="relative p-6 flex-auto">
-                        <div class="mb-5">
-                          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category Name</label>
-                          <input type="text" class="bg-gray-100 border border-gray-300  text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" placeholder="Add Category"/>
+                        <div className="mb-5">
+                          <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category Name</label>
+                          <input type="text" className="bg-gray-100 border border-gray-300  text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" placeholder="Add Category"/>
                         </div>
-                        <div class="mb-5">
-                          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Parent Category</label>
-                          <select id="countries" class="bg-gray-100 text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600">
+                        <div className="mb-5">
+                          <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Parent Category</label>
+                          <select id="countries" className="bg-gray-100 text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600">
 
                             <option value='' selected>Select an option</option>
                           </select>
@@ -120,6 +142,9 @@ const Category = () => {
         </div>
       </main>
     </div>
+    )}
+    
+    </>
   );
 }
 
