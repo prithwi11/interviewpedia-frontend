@@ -13,7 +13,7 @@ export const APP_LAST_URI = Object.freeze({
             method : 'POST'
         },
         category_add : {
-            path : 'v1/category/category_add',
+            path : 'v1/category/category-add',
             method : 'POST'
         },
         getCategoryById : {
