@@ -7,6 +7,30 @@ export const APP_LAST_URI = Object.freeze({
         signup : {
             path : 'v1/user/register-adminuser',
             method : 'POST'
+        },
+        category_list : {
+            path : 'v1/category/category-list',
+            method : 'POST'
+        },
+        category_add : {
+            path : 'v1/category/category-add',
+            method : 'POST'
+        },
+        getCategoryById : {
+            path : 'v1/category/category-edit',
+            method : 'POST'
+        },
+        category_update : {
+            path : 'v1/category/category-update',
+            method : 'POST'
+        },
+        category_delete : {
+            path : 'v1/category/category-delete',
+            method : 'POST'
+        },
+        category_add_csv : {
+            path : 'v1/category/category-add-csv',
+            method : 'POST'
         }
     }
 })

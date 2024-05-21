@@ -3,21 +3,31 @@ import axios from 'axios'
 import { APP_URL } from "../config";
 
 
-export function ApiCall (uriName, data, type) {
-    try {
-        if (APP_LAST_URI[type][uriName].method === "POST") {
-            let response = axios.post(APP_URL.BASE_URL + APP_LAST_URI[type][uriName].path, data)
-            return response
+export const ApiCall = async(uriName, data, type) => {
+    if (APP_LAST_URI[type][uriName].method === "POST") {
+        try {
+            let response = await axios.post(APP_URL.BASE_URL + APP_LAST_URI[type][uriName].path, data)
+            return response.data
         }
-        else {
-            let response = axios.get(APP_URL.BASE_URL + APP_LAST_URI[type][uriName].path)
-            return response
+        catch (e) {
+            if (e.response) {
+                throw e.response
+            }
+            else {
+                throw e
+            }
+            
         }
+        
     }
-    catch (e) {
-        console.log(e)
-    }
-    
+    else {
+        let response = axios.get(APP_URL.BASE_URL + APP_LAST_URI[type][uriName].path)
+            .then(() => {
+                return response
+            }).catch(error => {
+                console.log(error)
+            })
+    }   
 }
 // export function ApiCall(uriName, data, type) {
 //     return new Promise(async function (resolved, reject) {
