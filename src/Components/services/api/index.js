@@ -31,6 +31,14 @@ export const APP_LAST_URI = Object.freeze({
         category_add_csv : {
             path : 'v1/category/category-add-csv',
             method : 'POST'
+        },
+        question_list : {
+            path : 'v1/question/question-list',
+            method : 'POST'
+        },
+        question_add : {
+            path : 'v1/question/question-add',
+            method : 'POST'
         }
     }
 })
