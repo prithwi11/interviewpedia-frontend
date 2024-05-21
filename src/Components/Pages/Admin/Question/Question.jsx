@@ -9,24 +9,43 @@ import { ToastContainer, toast } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
 import { Dialog } from 'primereact/dialog';
 import DynamicButton from '../UI/Button';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { Sidebar } from 'primereact/sidebar';
+        
         
 import '../../../assets/css/main.css'
 
 
 const Question = () => {
-  const [showModal, setShowModal] = React.useState(false);
-  const [questionList, setQuestionList] = useState(null)
-  const [totalQuestionCount, setTotalQuestionCount] = useState(0)
+  const [addQuestionModal, setAddQuestionModal] = useState(false)
+  const [questionList, setQuestionList] = useState({})
+  const [categoryList, setCategoryList] = useState({})
   const [isLoading, setIsLoading] = useState(true)
+  const [addQuestionName, setAddQuestionName] = useState(null)
+  const [addAnswerName, setAddAnswerName] = useState(null)
+  const [addCategoryName, setAddCategoryName] = useState(null)
+  const [questionNameErrorText, setQuestionNameErrorText] = useState('')
+  const [answerNameErrorText, setAnswerNameErrorText] = useState('')
+  const [categoryNameErrorText, setCategoryNameErrorText] = useState('')
+  const [visibleRight, setVisibleRight] = useState(false);
+
   const [editQuestionModal, setEditQuestionModal] = useState(false)
   const [deleteQuestionModal, setDeleteQuestionModal] = useState(false)
-  const [addQuestionName, setAddQuestionName] = useState(null)
-  const [addParentCategoryName, setAddParentCategoryName] = useState(0)
-  const [parentCategoryNameErrorText, setParentCategoryNameErrorText] = useState('')
-  const [categoryNameErrorText, setCategoryNameErrorText] = useState('')
+  const [addParentCategoryName, setAddParentCategoryName] = useState(0) 
   const [addLevel, setAddLevel] = useState(0)
   const [categoryDetails, setCategoryDetails] = useState({})
   const [selectedFile, setSelectedFile] = useState(null);
+
+
+  const addQuestionTextHandler = (e) => {
+    setAddQuestionName(e.target.value)
+  }
+  const addAnswerTextHandler = (e) => {
+    setAddAnswerName(e.target.value)
+  }
+  const addCategoryHandler = (e) => {
+    setAddCategoryName(e.target.value)
+  }
 
   // const handleEditCategory = async(param) => {
   //   setEditQuestionModal(true)
@@ -130,35 +149,45 @@ const Question = () => {
   //   setAddLevel(new_level)
   // }
 
-  // const addCategoryHandler = async() => {
-  //   if (addCategoryName === '' || addCategoryName === null) {
-  //     setCategoryNameErrorText('Category Name is required')
-  //     return false
-  //   }
-  //   else {
-  //     setParentCategoryNameErrorText('')
-  //     setCategoryNameErrorText('')
-  //     const data = {
-  //       category_name: addCategoryName,
-  //       parent_id: addParentCategoryName,
-  //       level : addLevel,
-  //       user_id : 0
-  //     }
-  //     try {
-  //       const addCategory = await ApiCall('category_add', data,  'ADMIN')
-  //       setShowModal(false)
-  //       toast.success(addCategory.response.status.message, { hideProgressBar : true })
-  //       setAddCategoryName('')
-  //       setAddParentCategoryName(0)
-  //       setAddLevel(0)
-  //     }
-  //     catch (e) {
-  //       console.log(e)
-  //       toast.error(e.data.response.message, { hideProgressBar : true })
-  //     }
+  const addQuestionSetHandler = async() => {
+    if (addQuestionName === '' || addQuestionName === null) {
+      setQuestionNameErrorText('Question is required')
+      return false
+    }
+    else if (addAnswerName == '' || addAnswerName == null) {
+      setAnswerNameErrorText("Answer field is required")
+      return false
+    }
+    else if (addCategoryName === ''|| addCategoryName === null) {
+      setCategoryNameErrorText("Category field is required!")
+      return false
+    }
+    else {
+      setQuestionNameErrorText('')
+      setAnswerNameErrorText('')
+      setCategoryNameErrorText('')
+      const data = {
+        question_text : addQuestionName,
+        answer_text : addAnswerName,
+        category_id : addCategoryName,
+        user_id : '0'
+      }
+      try {
+        const addQUestion = await ApiCall('question_add', data,  'ADMIN')
+        setAddQuestionModal(false)
+        toast.success(addQUestion.response.status.message, { hideProgressBar : true })
+        setAddCategoryName(null)
+        setAddQuestionName('')
+        setAddAnswerName('')
+        getQuestionList()
+      }
+      catch (e) {
+        console.log(e)
+        toast.error(e.data.response.message, { hideProgressBar : true })
+      }
       
-  //   }
-  // }
+    }
+  }
 
   const getQuestionList = async() => {
     try {
@@ -167,7 +196,6 @@ const Question = () => {
       let payload = {first : first, rows : rows}
       let response = await ApiCall('question_list', payload, 'ADMIN')
       if (response) {
-        console.log(">>>>>>", response.response.data)
         setIsLoading(false)
         setQuestionList(response.response.data)
         // setTotalCategoryCount(response.response.data.total_count)
@@ -187,15 +215,42 @@ const Question = () => {
       }
     }
   }
+
+  const getCategoryList = async() => {
+    try {
+      let first = 0
+      let rows = 100
+      let payload = {first : first, rows : rows}
+      let response = await ApiCall('category_list', payload, 'ADMIN')
+      if (response) {
+        setIsLoading(false)
+        setCategoryList(response.response.data.response)
+      }
+    }
+    catch (e) {
+      if (e.data) {
+        if (e.status === 400) {
+          toast.error(e.data.response.message, { hideProgressBar : true })
+        }
+        else if (e.status === 500) {
+          toast.error(e.data.response.status.message, { hideProgressBar : true })
+        }
+      }
+      else {
+        toast.error(e.message, { hideProgressBar : true })
+      }
+    }
+  }
   useEffect(() => {
     setTimeout(() => 2000)
+    getCategoryList()
     getQuestionList()
   }, [])
 
   const actionTemplate = (rowData) => {
     return (
         <>
-           <DynamicButton label="Edit" color="var(--green-700)" />
+           <DynamicButton label="Edit" color="var(--green-700)" onClick={() => setVisibleRight(true)} />
            <DynamicButton label="Delete" color="var(--gray-200)" textColor='black' />
         </>
     );
@@ -213,14 +268,13 @@ const Question = () => {
             {/* Upper Part */}
             <h1 className='text-center font-bold text-3xl'>Question</h1>
             <div>
-              <button className='m-2 p-2 float-right bg-green-700 text-white rounded-lg hover:bg-green-900' onClick={setShowModal}>Add Question</button>
+              <button className='m-2 p-2 float-right bg-green-700 text-white rounded-lg hover:bg-green-900' onClick={setAddQuestionModal}>Add Question</button>
               <button className='m-2 p-2 float-right bg-green-700 text-white rounded-lg hover:bg-green-900'>Add CSV</button>
               <input type="file" id="csvUpload" className="hidden"  accept=".csv"/>
             </div>
 
           {/* Table */}
             <div className='my-16'>
-              {console.log('questionList', questionList)}
               <DataTable value={questionList} paginator rows={5} showGridlines sortMode="multiple" removableSort  stripedRows size='large' tableStyle={{ minWidth: '50rem' }}>
                   <Column field="question_text" header="Question" style={{ color: 'black' }} sortable></Column>
                   <Column field="answer_text" header="Answer" style={{ color: 'black' }} sortable></Column>
@@ -231,80 +285,101 @@ const Question = () => {
               </DataTable>
             </div>
             {/* Table Ends */}
+            <Dialog header="Add Question Set" visible={addQuestionModal} style={{ width: '40vw' }} onHide={() => setAddQuestionModal(false)}>
+                <div className="relative w-auto mx-auto max-w-3xl">
+                  {/*content*/}
+                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-gray-200 outline-none focus:outline-none">
+                    {/*header*/}
+                    {/*body*/}
+                    <div className="relative p-2 px-3 flex-auto">
+                      <div className="mb-2">
+                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Question</label>
+                        <InputTextarea autoResize  onChange={(e) => addQuestionTextHandler(e)} rows={5} cols={40} /> 
+                        <span className="text-red-500">{questionNameErrorText}</span>
+                      </div>
+                      <div className="mb-2">
+                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Answer</label>
+                        <InputTextarea autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} /> 
+                        <span className="text-red-500">{answerNameErrorText}</span>
+                      </div>
+                      <div className="mb-5">
+                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category</label>
+                        <select id="countries" className="bg-white border-gray-300 text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" onChange={(e) => addCategoryHandler(e)}>
 
-            {/* Modal add start */}
-            {showModal ? (
-              <>
-                  <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black/50">
-                    <div className="relative w-auto my-6 mx-auto max-w-3xl">
-                      {/*content*/}
-                      <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                        {/*header*/}
-                        <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                          <h3 className="text-3xl font-semibold">
-                            Add Category
-                          </h3>
-                          <button
-                            className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                            onClick={() => setShowModal(false)}
-                          >
-                            <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                              ×
-                            </span>
-                          </button>
-                        </div>
-                        {/*body*/}
-                        <div className="relative p-6 flex-auto">
-                          <div className="mb-5">
-                            <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category Name</label>
-                            <input 
-                              type="text" 
-                              className="bg-gray-100 border border-gray-300  text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" 
-                              placeholder="Add Category"
-                              onChange={(e) => setAddQuestionName(e.target.value)}
-                              />
-                              <span className="text-red-500">{categoryNameErrorText}</span>
-                          </div>
-                          <div className="mb-5">
-                            <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Parent Category</label>
-                            <select 
-                              id="countries" 
-                              className="bg-gray-100 text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600"
-                              
-                              >
-{/* 
-                                <option value='' selected>Select an option</option>
-                                {questionList.map((category) => {
-                                  return <option key={category.category_id} value={category.category_id}>{category.category_name}</option>
-                                })} */}
-                              
-                            </select>
-                            <span className='text-red-500'>{parentCategoryNameErrorText}</span>
-                          </div>
-                        </div>
-                        {/*footer*/}
-                        <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
-                          <button
-                            className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={() => setShowModal(false)}
-                          >
-                            Close
-                          </button>
-                          <button
-                            className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            >Save
-                          </button>
-                        </div>
+                          <option value='' selected>Select an option</option>
+                          {categoryList.map((category) => {
+                            return <option key={category.category_id} value={category.category_id}>{category.category_name}</option>
+                          })}
+                        </select>
+                        <span className="text-red-500">{categoryNameErrorText}</span>
                       </div>
                     </div>
+                    {/*footer*/}
+                    <div className="flex items-center justify-end py-2 px-3 border-t border-solid border-blueGray-200 rounded-b">
+                      <button
+                        className="text-red-500 background-transparent font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => setAddQuestionModal(false)}
+                      >
+                        Close
+                      </button>
+                      <button
+                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => addQuestionSetHandler()}
+                      >
+                        Submit
+                      </button>
+                    </div>
                   </div>
-              </>
-            ) : null}
+                </div>
+          </Dialog>
+            {/*Modal add starts*/}
+
             {/* Modal Add Ends */}
             {/* Modal Edit Starts */}
- 
+            <Sidebar visible={visibleRight} style={{ width: '50vw' }} position="right" onHide={() => setVisibleRight(false)}>
+                  <div class="bg-gray-50 shadow-md rounded px-2 pt-6 pb-8 mb-4">
+                    <div class="mb-4">
+                      <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        Question
+                      </label>
+                      <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} />
+                    </div>
+                    <div class="mb-6">
+                      <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                        Answer
+                      </label>
+                      <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} />
+                    </div>
+                    <div className="mb-4">
+                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category</label>
+                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" onChange={(e) => addCategoryHandler(e)}>
+
+                          <option value='' selected>Select an option</option>
+                          {categoryList.map((category) => {
+                            return <option key={category.category_id} value={category.category_id}>{category.category_name}</option>
+                          })}
+                        </select>
+                        <span className="text-red-500">{categoryNameErrorText}</span>
+                      </div>
+
+                      <div className="mb-4">
+                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Status</label>
+                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" value={categoryDetails.status}>
+
+                          <option value='' selected>Select an option</option>
+                          <option value='active'>Active</option>
+                          <option value='inactive'>Inactive</option>
+                        </select>
+                      </div>
+                    <div class="flex items-center justify-between">
+                      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                        Update
+                      </button>
+                    </div>
+                  </div>
+            </Sidebar>
           </div>
         </main>
         </div>
