@@ -11,6 +11,8 @@ import { Dialog } from 'primereact/dialog';
 import DynamicButton from '../UI/Button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Sidebar } from 'primereact/sidebar';
+import { Editor } from 'primereact/editor';
+        
         
         
 import '../../../assets/css/main.css'
@@ -27,127 +29,20 @@ const Question = () => {
   const [questionNameErrorText, setQuestionNameErrorText] = useState('')
   const [answerNameErrorText, setAnswerNameErrorText] = useState('')
   const [categoryNameErrorText, setCategoryNameErrorText] = useState('')
-  const [visibleRight, setVisibleRight] = useState(false);
-
+  const [questionDetails, setQuestionDetails] = useState({})
   const [editQuestionModal, setEditQuestionModal] = useState(false)
-  const [deleteQuestionModal, setDeleteQuestionModal] = useState(false)
-  const [addParentCategoryName, setAddParentCategoryName] = useState(0) 
-  const [addLevel, setAddLevel] = useState(0)
-  const [categoryDetails, setCategoryDetails] = useState({})
-  const [selectedFile, setSelectedFile] = useState(null);
+
 
 
   const addQuestionTextHandler = (e) => {
-    setAddQuestionName(e.target.value)
+    setAddQuestionName(e)
   }
   const addAnswerTextHandler = (e) => {
-    setAddAnswerName(e.target.value)
+    setAddAnswerName(e)
   }
   const addCategoryHandler = (e) => {
     setAddCategoryName(e.target.value)
   }
-
-  // const handleEditCategory = async(param) => {
-  //   setEditQuestionModal(true)
-  //   const category_id = param 
-  //   const data = {category_id : category_id}
-  //   try {
-  //     const categoryDetails = await ApiCall('getCategoryById', data, 'ADMIN')
-  //     setCategoryDetails(categoryDetails.response.data)
-  //   }
-  //   catch (e) {
-  //     toast.error(e.data.response.message, { hideProgressBar : true })
-  //   }
-  // }
-
-  // const editCategoryNameHandler = (e) => {
-  //   setCategoryDetails({...categoryDetails, category_name : e.target.value})
-  // }
-  // const editParentCategoryHandler = (e) => {
-  //   setCategoryDetails({...categoryDetails, parent_id : e.target.value})
-  // }
-
-  // const editCategoryStatusHandler = (e) => {
-  //   setCategoryDetails({...categoryDetails, status : e.target.value})
-  // }
-
-  // const updateCategoryHandler = async() => {
-  //   const data = {
-  //     category_id : categoryDetails.category_id,
-  //     category_name : categoryDetails.category_name,
-  //     parent_id : categoryDetails.parent_id,
-  //     status : categoryDetails.status
-  //   }
-  //   try {
-  //     const updateCategory = await ApiCall('category_update', data, 'ADMIN')
-  //     toast.success(updateCategory.response.data, { hideProgressBar : true })
-  //     setEditCategoryModal(false)
-  //     getCategoryList()
-  //   }
-  //   catch (e) {
-  //     toast.error(e.data.response.message, { hideProgressBar : true })
-  //   }
-          
-  // }
-
-  // const handleDeleteCategory = async(param) => {
-  //   setDeleteCategoryModal(true)
-  //   try {
-  //     const deleteCategory = await ApiCall('category_delete', {category_id : param}, 'ADMIN')
-  //     toast.success(deleteCategory.response.status.message, { hideProgressBar : true })
-  //     getCategoryList()
-  //   }
-  //   catch (e) {
-  //     toast.error(e.data.response.message, { hideProgressBar : true })
-  //   }
-  // }
-
-  // const handleFileChange = (event) => {
-  //   const file = event.target.files[0]; // Get the first selected file
-  //   if (file && file.type === 'text/csv') { // Validate for CSV file
-  //     setSelectedFile(file);
-  //   } else {
-  //     alert('Please select a valid CSV file.');
-  //   }
-  // };
-
-  // const handleUpload = async () => {
-  //   if (!selectedFile) {
-  //     alert('Please select a CSV file to upload.');
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append('csvFile', selectedFile); // Append file to FormData
-
-  //   try {
-  //     const response = await fetch('/your-upload-api', { // Replace with your API endpoint
-  //       method: 'POST',
-  //       body: formData,
-  //     });
-
-  //     if (response.ok) {
-  //       console.log('CSV file uploaded successfully!');
-  //       setSelectedFile(null); // Clear selected file after successful upload
-  //       // Handle successful upload actions (e.g., display success message)
-  //     } else {
-  //       console.error('Error uploading CSV file:', response.statusText);
-  //       alert('An error occurred while uploading the CSV file.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading CSV file:', error);
-  //     alert('An error occurred while uploading the CSV file.');
-  //   }
-  // };
-
-  // const handleParentCategoryChange = (e) => {
-  //   const parent_id = e.target.value
-  //   const selectedCategory = categoryList.find(category => category.category_id == e.target.value)
-  //   setAddParentCategoryName(parent_id)
-  //   const old_level = selectedCategory.level
-  //   const new_level = parseInt(old_level) + 1
-  //   setAddLevel(new_level)
-  // }
 
   const addQuestionSetHandler = async() => {
     if (addQuestionName === '' || addQuestionName === null) {
@@ -186,6 +81,68 @@ const Question = () => {
         toast.error(e.data.response.message, { hideProgressBar : true })
       }
       
+    }
+  }
+
+  const editQuestionHandler = async(question_id) => {
+    const data = {question_id : question_id}
+    try {
+      const questionEdit = await ApiCall('question_edit', data, 'ADMIN')
+      setQuestionDetails(questionEdit.response.data)
+      setEditQuestionModal(true)
+    }
+    catch (e) {
+      console.log(e)
+      toast.error(e.data.response.message, { hideProgressBar : true })
+    } 
+  }
+
+  const editQuestionTextHandler = (e) => {
+    setQuestionDetails({...questionDetails, question_text : e})
+  }
+  const editAnswerTextHandler = (e) => {
+    setQuestionDetails({...questionDetails, answer_text : e})
+  }
+
+  const editCategoryHandler = (e) => {
+    setQuestionDetails({...questionDetails, category_id : e.target.value})
+  }
+
+  const editStatusHandler = (e) => {
+    setQuestionDetails({...questionDetails, status : e.target.value})
+  }
+
+  const updateQuestion = async() => {
+    const data = {
+      question_id : questionDetails.question_id,
+      question_text : questionDetails.question_text,
+      answer_text : questionDetails.answer_text,
+      category_id : questionDetails.category_id ? questionDetails.category_id : questionDetails.int_category_question_mapping.fk_category_id,
+      status : questionDetails.status,
+      user_id : '0'
+    }
+
+    try {
+      const updateQuestion = await ApiCall('question_update', data, 'ADMIN')
+      toast.success(updateQuestion.response.data, { hideProgressBar : true })
+      setEditQuestionModal(false)
+      getQuestionList()
+    }
+    catch (e) {
+      console.log(e)
+      toast.error(e.data.response.message, { hideProgressBar : true })
+    } 
+  }
+
+  const deleteQuestionHandler = async(question_id) => {
+    const data = {question_id : question_id}
+    try {
+      const deleteQuestion = await ApiCall('question_delete', data, 'ADMIN')
+      toast.success(deleteQuestion.response.data, { hideProgressBar : true })
+      getQuestionList()
+    }
+    catch (e) {
+      toast.error(e.data.response.message, { hideProgressBar : true })
     }
   }
 
@@ -250,8 +207,8 @@ const Question = () => {
   const actionTemplate = (rowData) => {
     return (
         <>
-           <DynamicButton label="Edit" color="var(--green-700)" onClick={() => setVisibleRight(true)} />
-           <DynamicButton label="Delete" color="var(--gray-200)" textColor='black' />
+           <DynamicButton label="Edit" color="var(--green-700)" onClick={() => editQuestionHandler(rowData.question_id)} />
+           <DynamicButton label="Delete" color="var(--gray-200)" onClick={() => deleteQuestionHandler(rowData.question_id)} textColor='black' />
         </>
     );
 };
@@ -277,7 +234,7 @@ const Question = () => {
             <div className='my-16'>
               <DataTable value={questionList} paginator rows={5} showGridlines sortMode="multiple" removableSort  stripedRows size='large' tableStyle={{ minWidth: '50rem' }}>
                   <Column field="question_text" header="Question" style={{ color: 'black' }} sortable></Column>
-                  <Column field="answer_text" header="Answer" style={{ color: 'black' }} sortable></Column>
+                  {/* <Column field="answer_text" header="Answer" style={{ color: 'black' }} sortable></Column> */}
                   <Column field="int_category_question_mapping.int_category.category_name" header="Category" style={{ color: 'black' }} sortable></Column>
                   <Column field="status" header="Status" style={{ color: 'black' }}></Column>
                   <Column field="added_timestamp" header="Added on" style={{ color: 'black' }} sortable></Column>
@@ -285,24 +242,24 @@ const Question = () => {
               </DataTable>
             </div>
             {/* Table Ends */}
-            <Dialog header="Add Question Set" visible={addQuestionModal} style={{ width: '40vw' }} onHide={() => setAddQuestionModal(false)}>
-                <div className="relative w-auto mx-auto max-w-3xl">
-                  {/*content*/}
-                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-gray-200 outline-none focus:outline-none">
-                    {/*header*/}
-                    {/*body*/}
-                    <div className="relative p-2 px-3 flex-auto">
-                      <div className="mb-2">
-                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Question</label>
-                        <InputTextarea autoResize  onChange={(e) => addQuestionTextHandler(e)} rows={5} cols={40} /> 
-                        <span className="text-red-500">{questionNameErrorText}</span>
-                      </div>
-                      <div className="mb-2">
-                        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Answer</label>
-                        <InputTextarea autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} /> 
-                        <span className="text-red-500">{answerNameErrorText}</span>
-                      </div>
-                      <div className="mb-5">
+ 
+            {/*Modal add starts*/}
+
+            <Sidebar header="Add Question" visible={addQuestionModal} style={{ width: '50vw' }} position="right" onHide={() => setAddQuestionModal(false)}>
+                  <div class=" shadow-md rounded px-2 pt-6 pb-8 mb-4 border border-gray-800 focus:outline-none">
+                    <div class="mb-4">
+                      <label class="block  text-sm font-bold mb-2" for="username">
+                        Question
+                      </label>
+                      <Editor onTextChange={(e) => addQuestionTextHandler(e.htmlValue)} style={{ height: '320px' }} />
+                    </div>
+                    <div class="mb-6">
+                      <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                        Answer
+                      </label>
+                      <Editor  onTextChange={(e) => addAnswerTextHandler(e.htmlValue)} style={{ height: '320px' }} />
+                    </div>
+                    <div className="mb-4">
                         <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category</label>
                         <select id="countries" className="bg-white border-gray-300 text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" onChange={(e) => addCategoryHandler(e)}>
 
@@ -313,48 +270,36 @@ const Question = () => {
                         </select>
                         <span className="text-red-500">{categoryNameErrorText}</span>
                       </div>
-                    </div>
-                    {/*footer*/}
-                    <div className="flex items-center justify-end py-2 px-3 border-t border-solid border-blueGray-200 rounded-b">
-                      <button
-                        className="text-red-500 background-transparent font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => setAddQuestionModal(false)}
-                      >
-                        Close
-                      </button>
-                      <button
-                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => addQuestionSetHandler()}
-                      >
+
+                    <div class="flex items-center justify-between">
+                      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={addQuestionSetHandler}>
                         Submit
                       </button>
                     </div>
                   </div>
-                </div>
-          </Dialog>
-            {/*Modal add starts*/}
+            </Sidebar>
 
             {/* Modal Add Ends */}
             {/* Modal Edit Starts */}
-            <Sidebar visible={visibleRight} style={{ width: '50vw' }} position="right" onHide={() => setVisibleRight(false)}>
-                  <div class="bg-gray-50 shadow-md rounded px-2 pt-6 pb-8 mb-4">
+            <Sidebar header="Update Question" visible={editQuestionModal} style={{ width: '50vw' }} position="right" onHide={() => setEditQuestionModal(false)}>
+                  <div class="bg-gray-50 shadow-md rounded px-2 pt-6 pb-8 mb-4 border border-gray-800 focus:outline-none">
                     <div class="mb-4">
                       <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
                         Question
                       </label>
-                      <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} />
+                      <Editor value={questionDetails.question_text} onTextChange={(e) => editQuestionTextHandler(e.htmlValue)} style={{ height: '320px' }} />
+                      {/* <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => editQuestionTextHandler(e)} rows={5} cols={40} value={questionDetails.question_text} /> */}
                     </div>
                     <div class="mb-6">
                       <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
                         Answer
                       </label>
-                      <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => addAnswerTextHandler(e)} rows={5} cols={40} />
+                      <Editor value={questionDetails.answer_text} onTextChange={(e) => editAnswerTextHandler(e.htmlValue)} style={{ height: '320px' }} />
+                      {/* <InputTextarea className=' border border-gray-400 focus:outline-none' autoResize  onChange={(e) => editAnswerTextHandler(e)} rows={5} cols={40} value={questionDetails.answer_text} /> */}
                     </div>
                     <div className="mb-4">
                         <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Category</label>
-                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" onChange={(e) => addCategoryHandler(e)}>
+                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" onChange={(e) => editCategoryHandler(e)} value={questionDetails?.category_id ? questionDetails?.category_id : questionDetails?.int_category_question_mapping?.int_category?.category_id}>
 
                           <option value='' selected>Select an option</option>
                           {categoryList.map((category) => {
@@ -366,7 +311,7 @@ const Question = () => {
 
                       <div className="mb-4">
                         <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Status</label>
-                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" value={categoryDetails.status}>
+                        <select id="countries" className="bg-white border border-gray-400 focus:outline-none text-sm rounded-lg  block w-full p-2.5 dark:border-gray-600" value={questionDetails.status} onChange={(e) => editStatusHandler(e)}>
 
                           <option value='' selected>Select an option</option>
                           <option value='active'>Active</option>
@@ -374,7 +319,7 @@ const Question = () => {
                         </select>
                       </div>
                     <div class="flex items-center justify-between">
-                      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={updateQuestion}>
                         Update
                       </button>
                     </div>

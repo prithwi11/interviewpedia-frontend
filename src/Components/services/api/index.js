@@ -39,6 +39,18 @@ export const APP_LAST_URI = Object.freeze({
         question_add : {
             path : 'v1/question/question-add',
             method : 'POST'
+        },
+        question_edit : {
+            path : 'v1/question/question-edit',
+            method : 'POST'
+        },
+        question_update : {
+            path : 'v1/question/question-update',
+            method : 'POST'
+        },
+        question_delete : {
+            path : 'v1/question/question-delete',
+            method : 'POST'
         }
     }
 })
