@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Dialog } from 'primereact/dialog';
 import DynamicButton from '../UI/Button';
         
-import './Category.css'
+import '../../../assets/css/main.css'
 
 
 const Category = () => {
