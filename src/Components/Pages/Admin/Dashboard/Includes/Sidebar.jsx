@@ -1,7 +1,15 @@
+import React from 'react'
+import { Link, redirect } from 'react-router-dom';
+import { useNavigate } from "react-router-dom"
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
+   const navigate = useNavigate()
+   const handleLogOut = () => {
+      window.localStorage.removeItem('loginDetails')
+      window.location.reload()
+   }
   return (
     <aside id="sidebar" className="fixed  z-20 h-full top-0 left-0 pt-12 flex lg:flex flex-shrink-0 flex-col w-1/6 transition-width duration-75 " aria-label="Sidebar">
       <div className="relative flex-1 flex flex-col min-h-0 border-r dark:bg-gray-900 pt-0 h-screen">
@@ -29,6 +37,11 @@ const Sidebar = () => {
                         <Link to="/admin/question"  class="text-base text-white font-normal rounded-lg flex items-center p-2 hover:text-green-500 group">
                            <span class="ml-3">Questions</span>
                         </Link>
+                     </li>
+                     <li>
+                        <p onClick={() => handleLogOut()} class="text-base text-white font-normal rounded-lg flex items-center p-2 hover:text-green-500 group">
+                           <span class="ml-3">Logout</span>
+                        </p>
                      </li>
                   </ul>
             </div>

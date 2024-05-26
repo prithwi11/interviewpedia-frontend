@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { IMAGE_NAME } from '../../../enums/index'
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, redirect } from "react-router-dom"
 import { emailValidator } from '../../../validators'
 import { passwordValidator } from '../../../validators'
 import { ToastContainer, toast } from 'react-toastify'
@@ -45,15 +45,21 @@ const Login = () => {
       }
       try {
         const login_data = await ApiCall('signin', data, COMMON.USER_TYPES[0].label)
+        console.log('login_data', login_data)
         if (login_data) {
-          if (login_data.data.response.status.action_status === false) {
-            toast.error(login_data.data.response.status.message, { hideProgressBar : true })
+          if (login_data.response.status.action_status === false) {
+            console.log(">>>>>>>>>>")
+            toast.error(login_data.response.status.message, { hideProgressBar : true })
           }
           else {
+            console.log("<<<<<<<<,,")
             toast.success('Logged in successfully', { hideProgressBar : true })
-            window.localStorage.setItem('loginDetails', JSON.stringify(login_data.data.response.status.message))
-            dispatch(addLoginDetails(login_data.data.response.status.message))
-            navigate('/admin/dashboard')
+            window.localStorage.setItem('loginDetails', JSON.stringify(login_data.response.data))
+            window.localStorage.setItem('authToken', JSON.stringify(login_data.response.data.token))
+            dispatch(addLoginDetails(login_data.response.data))
+            console.log("kkkk")
+            window.location.reload()
+            // navigate('/admin/dashboard')
           }
         }
       }
@@ -76,7 +82,7 @@ const Login = () => {
               <img class="w-20 h-20" src={IMAGE_NAME.IMAGE_NAME.LOGO_ICON} alt="logo" />
                   <span class="text-green-500">INTERVIEW </span> PEDIA
           </Link>
-          <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div class="w-full bg-gradient-to-b from-customGreenLight to-customGreenDark rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
               <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                   <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                       Sign in to your account

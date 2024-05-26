@@ -1,20 +1,22 @@
 // Routes.js
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, redirect } from 'react-router-dom';
 import AdminRouter from './AdminRouter';
 import ClientRouter from './ClientRouter';
 import Login from '../Pages/Admin/UserManagement/Login';
 import Register from '../Pages/Admin/UserManagement/Register';
 
 const AppRouter = () => {
-  const loginDetails = (window.localStorage.getItem('loginDetails'))
-  let  isAdminUserLoggedIn = true
+  // const [isAdminUserLoggedIn, setIsAdminUserLoggedIn] = useState(false);
+  const loginDetails = JSON.parse((window.localStorage.getItem('loginDetails')))
+  let isAdminUserLoggedIn = false
   if (loginDetails) {
-     isAdminUserLoggedIn = true  
+    isAdminUserLoggedIn = true   
   }
   else {
-     isAdminUserLoggedIn = false
+    isAdminUserLoggedIn = false
   }
+
   return (
     <Router>
       <Routes>

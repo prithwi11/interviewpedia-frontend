@@ -4,6 +4,18 @@ import { APP_URL } from "../config";
 
 
 export const ApiCall = async(uriName, data, type) => {
+    if (APP_LAST_URI[type][uriName].isAuth = true) {
+        const authToken = JSON.parse(window.localStorage.getItem("authToken"))
+        axios.interceptors.request.use(
+            config => {
+                if (config.headers.authorization === undefined) {
+                    config.headers.authorization = `Bearer ` + authToken
+                }
+                return config
+            }
+        )
+    }
+export const ApiCall = async(uriName, data, type) => {
     if (APP_LAST_URI[type][uriName].method === "POST") {
         try {
             let response = await axios.post(APP_URL.BASE_URL + APP_LAST_URI[type][uriName].path, data)
@@ -28,6 +40,7 @@ export const ApiCall = async(uriName, data, type) => {
                 console.log(error)
             })
     }   
+}
 }
 // export function ApiCall(uriName, data, type) {
 //     return new Promise(async function (resolved, reject) {
