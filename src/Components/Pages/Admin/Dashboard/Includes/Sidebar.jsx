@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link, redirect } from 'react-router-dom';
 import { useNavigate } from "react-router-dom"
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
    const navigate = useNavigate()
@@ -49,4 +51,4 @@ const Sidebar = () => {
   );
 }
 
-export default Sidebar
+export default Sidebar;
