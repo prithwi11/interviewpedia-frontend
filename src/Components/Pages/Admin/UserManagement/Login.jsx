@@ -45,21 +45,16 @@ const Login = () => {
       }
       try {
         const login_data = await ApiCall('signin', data, COMMON.USER_TYPES[0].label)
-        console.log('login_data', login_data)
         if (login_data) {
           if (login_data.response.status.action_status === false) {
-            console.log(">>>>>>>>>>")
             toast.error(login_data.response.status.message, { hideProgressBar : true })
           }
           else {
-            console.log("<<<<<<<<,,")
             toast.success('Logged in successfully', { hideProgressBar : true })
             window.localStorage.setItem('loginDetails', JSON.stringify(login_data.response.data))
             window.localStorage.setItem('authToken', JSON.stringify(login_data.response.data.token))
             dispatch(addLoginDetails(login_data.response.data))
-            console.log("kkkk")
             window.location.reload()
-            // navigate('/admin/dashboard')
           }
         }
       }
