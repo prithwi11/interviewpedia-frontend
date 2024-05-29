@@ -68,7 +68,17 @@ export const APP_LAST_URI = Object.freeze({
     },
     CLIENT : {
         question_for_dashboard : {
-            path : '/v1/home/question-for-dashboard',
+            path : 'v1/home/question-for-dashboard',
+            method : 'POST',
+            isAuth : false
+        },
+        category_for_user : {
+            path : 'v1/user/category/category-list-user',
+            method : 'POST',
+            isAuth : false
+        },
+        category_details : {
+            path : 'v1/user/category/category-details',
             method : 'POST',
             isAuth : false
         }
