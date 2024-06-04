@@ -1,12 +1,12 @@
 export const APP_LAST_URI = Object.freeze({
     ADMIN : {
         signin : {
-            path : 'v1/user/admin-login',
+            path : 'v1/admin/admin-login',
             method : 'POST',
             isAuth : false,
         },
         signup : {
-            path : 'v1/user/register-adminuser',
+            path : 'v1/admin/register-adminuser',
             method : 'POST',
             isAuth : true,
         },
@@ -79,6 +79,26 @@ export const APP_LAST_URI = Object.freeze({
         },
         category_details : {
             path : 'v1/user/category/category-details',
+            method : 'POST',
+            isAuth : false
+        },
+        register : {
+            path : 'v1/user/register',
+            method : 'POST',
+            isAuth : false
+        },
+        create_verification : {
+            path : 'v1/user/create-verification',
+            method : 'POST',
+            isAuth : false
+        },
+        check_verification : {
+            path : 'v1/user/check-verification',
+            method : 'POST',
+            isAuth : false
+        },
+        login : {
+            path : 'v1/user/login',
             method : 'POST',
             isAuth : false
         }

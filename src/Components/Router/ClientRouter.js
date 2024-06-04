@@ -5,6 +5,8 @@ import Home from '../Pages/User/Home/Home';
 import Header from '../Pages/User/Includes/Header';
 import Category from '../Pages/User/Category/Category';
 import CategoryDetails from '../Pages/User/Category/CategoryDetails';
+import Login from '../Pages/User/User/Login'
+import Register from '../Pages/User/User/Register'
 
 const ClientRouter = () => {
   return (
@@ -14,6 +16,8 @@ const ClientRouter = () => {
           <Route exact path="/" element={<Home />} />
           <Route exact path="/category" element={<Category />} />
           <Route exact path='/category/:id' element={<CategoryDetails />} />
+          <Route exact path='/login' element={<Login />} />
+          <Route exact path='/register' element={<Register />} />
       </Routes>
     </>
   );
