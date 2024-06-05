@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { emailValidator } from '../../../validators'
 import { passwordValidator } from '../../../validators'
 import { ToastContainer, toast } from 'react-toastify'
 import { ApiCall } from '../../../services/middleware'
+import { IMAGE_NAME } from '../../../enums'
 
 const Login = () => {
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate()
 
   const handleEmailChange = (value) => {
     setEmail(value);
@@ -29,18 +33,46 @@ const Login = () => {
     }
 
     if (errCournter === 0) {
+        setIsFormSubmitting(true)
       const data = {
         email : email,
         password : password
       }
       try {
         const login_user = await ApiCall('login', data, 'CLIENT')
-        console.log('login_user', login_user)
+        window.localStorage.setItem('userLoginDetails', login_user.response.data)
+        navigate('/')
       }
       catch (e) {
         console.log(e)
         toast.error(e.data.response.status.message)
+        if (e.data.response.data?.is_verified === '0') {
+            sendEmail({user_id : e.data.response.data.user_id, email : email, password : password})
+            navigate('/verification')
+        }
       }
+    }
+  }
+
+  const sendEmail = async(userData) => {
+    const data = {
+        email : userData.email,
+        userId : userData.user_id
+    }
+    
+    try {
+        const create_verification = await ApiCall('create_verification', data, 'CLIENT')
+        toast.success('Verification email sent successfully')
+        setIsFormSubmitting(false)
+        window.localStorage.setItem('userIdLogin', userData.user_id)
+        window.localStorage.setItem('emailLogin', email)
+        window.localStorage.setItem('passwordLogin', password)
+        navigate('/verification')
+    }
+    catch (e) {
+        setIsFormSubmitting(false)
+        console.log(e)
+        toast.error(e.data.response.status.message)
     }
   }
 
@@ -111,7 +143,16 @@ const Login = () => {
                                 class="w-full px-8 py-4 my-4 rounded-lg font-medium border border-black text-sm focus:outline-none"
                                 type="password" placeholder="Password" onChange={(e) => handlePasswordChange(e.target.value)} />
                             <button
-                                class="mt-5 tracking-wide font-semibold bg-green-500 text-gray-100 w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none" onClick={handleFormSubmit}>
+                                className={`
+                                mt-5 tracking-wide font-semibold bg-green-500 text-gray-100 w-full py-4 rounded-lg flex items-center justify-center focus:shadow-outline focus:outline-none
+                                ${isFormSubmitting ? 'opacity-80 cursor-not-allowed' : 'hover:bg-green-700 transition-all duration-300 ease-in-out '}
+                                `} 
+                                onClick={handleFormSubmit}
+                                disabled={isFormSubmitting}
+                                >
+                                { isFormSubmitting && (
+                                    <img src={IMAGE_NAME.IMAGE_NAME.BUTTON_LOADER} className='h-6 mr-2' alt='button-loader' />
+                                )}
                                 <span class="">
                                     Sign In
                                 </span>

@@ -7,6 +7,7 @@ import Category from '../Pages/User/Category/Category';
 import CategoryDetails from '../Pages/User/Category/CategoryDetails';
 import Login from '../Pages/User/User/Login'
 import Register from '../Pages/User/User/Register'
+import Verificaton from '../Pages/User/User/Verification';
 
 const ClientRouter = () => {
   return (
@@ -18,6 +19,7 @@ const ClientRouter = () => {
           <Route exact path='/category/:id' element={<CategoryDetails />} />
           <Route exact path='/login' element={<Login />} />
           <Route exact path='/register' element={<Register />} />
+          <Route exact path='/verification' element={<Verificaton />} />
       </Routes>
     </>
   );
