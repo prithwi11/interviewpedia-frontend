@@ -8,6 +8,7 @@ import CategoryDetails from '../Pages/User/Category/CategoryDetails';
 import Login from '../Pages/User/User/Login'
 import Register from '../Pages/User/User/Register'
 import Verificaton from '../Pages/User/User/Verification';
+import Profile from '../Pages/User/User/Profile';
 
 const ClientRouter = () => {
   return (
@@ -20,6 +21,7 @@ const ClientRouter = () => {
           <Route exact path='/login' element={<Login />} />
           <Route exact path='/register' element={<Register />} />
           <Route exact path='/verification' element={<Verificaton />} />
+          <Route exact path='/profile' element={<Profile />} />
       </Routes>
     </>
   );

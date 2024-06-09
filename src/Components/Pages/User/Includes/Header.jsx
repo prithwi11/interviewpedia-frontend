@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { IMAGE_NAME } from '../../../enums';
 
 const Header = () => {
-    const userDetails = window.localStorage.getItem('userDetails')
+    const userDetails = window.localStorage.getItem('userLoginDetails')
   return (
-    <nav className="  fixed z-30 w-full dark:bg-gray-900">
+    <nav className="  fixed z-30 -mt-24 w-full dark:bg-gray-900">
       <div className="px-3 py-3 lg:px-5 lg:pl-3 dark:bg-gray-900">
         <div class="flex items-center justify-between">
             <div class="flex items-center justify-start">
@@ -32,7 +32,7 @@ const Header = () => {
                 {userDetails  ? (
                     <div class="hidden lg:flex items-center">
                         <img className='w-8 h-8' src={IMAGE_NAME.IMAGE_NAME.ADMIN_PROFILE_IMG} alt='profile-img'/>
-                        <span className='text-white'>Super Admin</span>
+                        <span className='text-white'>{userDetails.full_name}</span>
                     </div>
                 ) : (
                     <div className='hidden lg:flex items-center'>
